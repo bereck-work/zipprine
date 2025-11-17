@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"zipprine/internal/archiver"
@@ -20,34 +21,105 @@ func RunCompressFlow() error {
 	var verify bool
 	var compressionLevel string
 
+	// Get current working directory
+	cwd, _ := os.Getwd()
+
+	// Function to get directory completions
+	getDirCompletions := func(input string) []string {
+		if input == "" {
+			input = "."
+		}
+
+		// Expand home directory
+		if strings.HasPrefix(input, "~") {
+			home, err := os.UserHomeDir()
+			if err == nil {
+				input = filepath.Join(home, input[1:])
+			}
+		}
+
+		// Get the directory and file pattern
+		dir := filepath.Dir(input)
+		pattern := filepath.Base(input)
+
+		// If input ends with /, we want to list that directory
+		if strings.HasSuffix(input, string(filepath.Separator)) {
+			dir = input
+			pattern = ""
+		}
+
+		// Read directory
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			// If can't read, try parent directory
+			entries, err = os.ReadDir(".")
+			if err != nil {
+				return []string{}
+			}
+			dir = "."
+		}
+
+		completions := []string{}
+		for _, entry := range entries {
+			name := entry.Name()
+			
+			// Skip hidden files unless explicitly requested
+			if strings.HasPrefix(name, ".") && !strings.HasPrefix(pattern, ".") {
+				continue
+			}
+
+			// Filter by pattern
+			if pattern != "" && !strings.HasPrefix(strings.ToLower(name), strings.ToLower(pattern)) {
+				continue
+			}
+
+			fullPath := filepath.Join(dir, name)
+			if entry.IsDir() {
+				fullPath += string(filepath.Separator)
+			}
+
+			completions = append(completions, fullPath)
+		}
+
+		// Limit to 10 suggestions
+		if len(completions) > 10 {
+			completions = completions[:10]
+		}
+
+		return completions
+	}
+
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
 				Title("📁 Source Path").
-				Description("Enter the path to compress (file or directory)").
-				Placeholder("/path/to/source").
+				Description("Enter the path to compress (file or directory) - Tab for completions").
+				Placeholder(cwd).
 				Value(&sourcePath).
 				Validate(func(s string) error {
 					if s == "" {
 						return fmt.Errorf("source path cannot be empty")
 					}
+					// Expand home directory
+					if strings.HasPrefix(s, "~") {
+						home, err := os.UserHomeDir()
+						if err == nil {
+							s = filepath.Join(home, s[1:])
+						}
+					}
 					if _, err := os.Stat(s); os.IsNotExist(err) {
 						return fmt.Errorf("path does not exist")
 					}
 					return nil
-				}),
+				}).
+				Suggestions(getDirCompletions("")),
 
 			huh.NewInput().
 				Title("💾 Output Path").
-				Description("Where to save the archive").
-				Placeholder("/path/to/output.zip").
+				Description("Where to save (leave empty for auto-naming in current directory)").
+				Placeholder("Auto: <source-name>.<type> in current directory").
 				Value(&outputPath).
-				Validate(func(s string) error {
-					if s == "" {
-						return fmt.Errorf("output path cannot be empty")
-					}
-					return nil
-				}).Suggestions([]string{".zip", ".tar.gz", ".tar", ".gz"}),
+				Suggestions(getDirCompletions("")),
 		),
 
 		huh.NewGroup(
@@ -101,6 +173,66 @@ func RunCompressFlow() error {
 		return err
 	}
 
+	// Expand home directory in source path
+	if strings.HasPrefix(sourcePath, "~") {
+		home, err := os.UserHomeDir()
+		if err == nil {
+			sourcePath = filepath.Join(home, sourcePath[1:])
+		}
+	}
+
+	// Make source path absolute
+	if !filepath.IsAbs(sourcePath) {
+		absPath, err := filepath.Abs(sourcePath)
+		if err == nil {
+			sourcePath = absPath
+		}
+	}
+
+	// Auto-generate output path if not provided
+	if outputPath == "" {
+		sourceName := filepath.Base(sourcePath)
+		
+		// Remove trailing slashes
+		sourceName = strings.TrimSuffix(sourceName, string(filepath.Separator))
+		
+		// Determine file extension based on archive type
+		var extension string
+		switch models.ArchiveType(archiveTypeStr) {
+		case models.ZIP:
+			extension = ".zip"
+		case models.TARGZ:
+			extension = ".tar.gz"
+		case models.TAR:
+			extension = ".tar"
+		case models.GZIP:
+			extension = ".gz"
+		default:
+			extension = ".zip"
+		}
+
+		// Create output path in current working directory
+		outputPath = filepath.Join(cwd, sourceName+extension)
+		
+		fmt.Println(InfoStyle.Render(fmt.Sprintf("📝 Auto-generated output: %s", outputPath)))
+	} else {
+		// Expand home directory in output path
+		if strings.HasPrefix(outputPath, "~") {
+			home, err := os.UserHomeDir()
+			if err == nil {
+				outputPath = filepath.Join(home, outputPath[1:])
+			}
+		}
+
+		// Make output path absolute if relative
+		if !filepath.IsAbs(outputPath) {
+			absPath, err := filepath.Abs(outputPath)
+			if err == nil {
+				outputPath = absPath
+			}
+		}
+	}
+
 	config.SourcePath = sourcePath
 	config.OutputPath = outputPath
 	config.ArchiveType = models.ArchiveType(archiveTypeStr)
@@ -123,12 +255,26 @@ func RunCompressFlow() error {
 
 	fmt.Println()
 	fmt.Println(InfoStyle.Render("🎯 Starting compression..."))
+	fmt.Println(InfoStyle.Render(fmt.Sprintf("   Source: %s", config.SourcePath)))
+	fmt.Println(InfoStyle.Render(fmt.Sprintf("   Output: %s", config.OutputPath)))
 
 	if err := archiver.Compress(config); err != nil {
 		return err
 	}
 
 	fmt.Println(SuccessStyle.Render("✅ Archive created successfully!"))
+	
+	// Show file info
+	fileInfo, err := os.Stat(config.OutputPath)
+	if err == nil {
+		sizeKB := float64(fileInfo.Size()) / 1024
+		sizeMB := sizeKB / 1024
+		if sizeMB >= 1 {
+			fmt.Println(InfoStyle.Render(fmt.Sprintf("📦 Size: %.2f MB", sizeMB)))
+		} else {
+			fmt.Println(InfoStyle.Render(fmt.Sprintf("📦 Size: %.2f KB", sizeKB)))
+		}
+	}
 
 	if config.VerifyIntegrity {
 		fmt.Println(InfoStyle.Render("🔍 Verifying archive integrity..."))
