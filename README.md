@@ -1,6 +1,6 @@
-# 🗜️ Zipprine - Advanced Archive Manager
+# 🗜️ Zipprine - TUI zipping tool
 
-A beautiful, feature-rich TUI application for managing archives with style!
+A simple and clean TUI application for managing archives/
 
 ## ✨ Features
 
@@ -29,14 +29,14 @@ A beautiful, feature-rich TUI application for managing archives with style!
 
 ```bash
 # Clone the repository
-git clone https://github.com/bereck-work/ziprine.git
-cd ziprine
+git clone https://github.com/bereck-work/ziporine.git
+cd zipprine
 
 # Install dependencies
 go mod download
 
 # Build
-go build -o ziprine ./cmd/ziprine
+go build -o zipprine ./cmd/ziprine
 
 # Run
 ./ziprine
@@ -108,8 +108,8 @@ ziprine/
 
 ## 📝 License
 
-MIT License - Feel free to use and modify!
+MIT License
 
-## 🤝 Contributing
+## Things to do
 
-Contributions are welcome! Feel free to open issues or submit PRs.
+- [ ] Add unit tests
