@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	fmt.Println(ui.TitleStyle.Render("🗜️  Zipprine - Archive Like a Pro! 🚀"))
+	fmt.Println(ui.TitleStyle.Render("Zipprine - TUI Archiver"))
 	fmt.Println()
 
 	var operation string
