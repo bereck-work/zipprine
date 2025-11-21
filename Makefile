@@ -1,4 +1,4 @@
-# zipprine Makefile - Cross-platform build system
+# zipprine Makefile
 # Build for all major architectures
 
 .PHONY: all build clean install test help deps build-all release
@@ -53,8 +53,29 @@ deps: ## Download dependencies
 
 test: ## Run tests
 	@echo "$(BLUE)🧪 Running tests...$(NC)"
-	@$(GOTEST) -v ./...
+	@$(GOTEST) -race -timeout 30s ./...
 	@echo "$(GREEN)✅ Tests passed$(NC)"
+
+test-verbose: ## Run tests with verbose output
+	@echo "$(BLUE)🧪 Running tests (verbose)...$(NC)"
+	@$(GOTEST) -v -race -timeout 30s ./...
+	@echo "$(GREEN)✅ Tests passed$(NC)"
+
+test-coverage: ## Run tests with coverage report
+	@echo "$(BLUE)📊 Running tests with coverage...$(NC)"
+	@mkdir -p $(BUILD_DIR)
+	@$(GOTEST) -race -coverprofile=$(BUILD_DIR)/coverage.out -covermode=atomic ./...
+	@$(GOCMD) tool cover -html=$(BUILD_DIR)/coverage.out -o $(BUILD_DIR)/coverage.html
+	@echo "$(GREEN)✅ Coverage report generated: $(BUILD_DIR)/coverage.html$(NC)"
+	@$(GOCMD) tool cover -func=$(BUILD_DIR)/coverage.out | tail -n 1
+
+bench: ## Run benchmarks
+	@echo "$(BLUE)📊 Running benchmarks...$(NC)"
+	@$(GOTEST) -bench=. -benchmem -run=^$$ ./...
+	@echo "$(GREEN)✅ Benchmarks complete$(NC)"
+
+test-all: test-coverage bench ## Run all tests with coverage and benchmarks
+	@echo "$(GREEN)✨ All tests and benchmarks complete$(NC)"
 
 clean: ## Clean build artifacts
 	@echo "$(YELLOW)🧹 Cleaning build artifacts...$(NC)"
