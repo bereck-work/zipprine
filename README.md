@@ -1,6 +1,6 @@
 # 🗜️ Zipprine - TUI zipping tool
 
-A simple and clean TUI application for managing archives/
+Zipprine is a modern TUI application for managing archives with support for multiple formats including ZIP, TAR, TAR.GZ, and GZIP.
 
 ## ✨ Features
 
@@ -25,53 +25,88 @@ A simple and clean TUI application for managing archives/
 - **Checksum verification**: SHA256 integrity checks
 - **Format detection**: Magic byte analysis
 
+### 📚 Batch Operations
+
+- **Batch compression**: Compress multiple files/folders at once
+- **Batch extraction**: Extract multiple archives simultaneously
+- **Parallel processing**: Speed up operations with concurrent workers
+- **Progress tracking**: Real-time feedback for each operation
+
+### ⚖️ Archive Comparison
+
+- **Compare two archives**: Find differences between archives
+- **Detailed reports**: See files unique to each archive
+- **File differences**: Identify files that differ in size or modification time
+- **Cross-format support**: Compare different archive formats
+
+### 🔄 Archive Conversion
+
+- **Format conversion**: Convert between ZIP, TAR, TAR.GZ formats
+- **Preserve contents**: Maintains file structure and permissions
+- **Automatic extraction**: Seamless conversion process
+
 ## 🚀 Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/bereck-work/ziporine.git
+git clone https://gitlab.com/bereckobrian/zipprine.git
 cd zipprine
 
-# Install dependencies
-go mod download
+# Build for your platform
+make build
 
-# Build
-go build -o zipprine ./cmd/ziprine
-
-# Run
-./ziprine
+# Run it
+./build/zipprine
 ```
 
 ## 📖 Usage
 
-Simply run `ziprine` and follow the interactive prompts!
+Just run `zipprine` and follow the interactive menu:
 
-### Compress Files
+**Compress** - Choose files/folders, pick a format (ZIP, TAR, TAR.GZ, GZIP), and set your preferences
 
-```bash
-./ziprine
-# Select: Compress files/folders
-# Enter source path: /path/to/folder
-# Choose format: ZIP, TAR.GZ, TAR, or GZIP
-# Set compression level and filters
-```
+**Extract** - Point to an archive and choose where to extract (format is auto-detected)
 
-### Extract Archives
+**Analyze** - View detailed stats about any archive without extracting it
 
-```bash
-./ziprine
-# Select: Extract archive
-# Archive type is auto-detected!
-# Choose destination and options
-```
+**Batch Operations** - Compress or extract multiple files at once with optional parallel processing
 
-### Analyze Archives
+**Compare** - Find differences between two archives
+
+**Convert** - Change archive formats while preserving structure
+
+## 🔨 Building
 
 ```bash
-./ziprine
-# Select: Analyze archive
-# View detailed statistics and file listing
+# Build for your platform
+make build
+
+# Build for all platforms (Linux, macOS, Windows)
+make build-all
+
+# Install to $GOPATH/bin
+make install
+
+# Or use Docker
+docker build -t zipprine .
 ```
+
+## 🧪 Testing
+
+We have comprehensive test coverage:
+
+```bash
+# Run tests
+make test
+
+# With coverage report
+make test-coverage
+
+# Run benchmarks
+make bench
+```
+
+**Coverage:** 77.9% for archiver, 96.6% for utilities
 
 ## 🎨 Pattern Examples
 
@@ -88,18 +123,6 @@ Simply run `ziprine` and follow the interactive prompts!
 - `src/*,docs/*` - Only src and docs folders
 - `*.md,*.txt` - Only markdown and text files
 
-## 🏗️ Project Structure
-
-```
-ziprine/
-├── cmd/ziprine/          # Main application entry
-├── internal/
-│   ├── archiver/         # Archive operations
-│   ├── ui/              # TUI components
-│   └── models/          # Data structures
-└── pkg/fileutil/        # Utility functions
-```
-
 ## 🛠️ Technologies
 
 - **[Charm Bracelet Huh](https://github.com/charmbracelet/huh)** - Beautiful TUI forms
@@ -109,7 +132,3 @@ ziprine/
 ## 📝 License
 
 MIT License
-
-## Things to do
-
-- [ ] Add unit tests
