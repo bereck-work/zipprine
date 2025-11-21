@@ -20,7 +20,7 @@ func RunExtractFlow() error {
 		huh.NewGroup(
 			huh.NewInput().
 				Title("📦 Archive Path").
-				Description("Path to the archive file").
+				Description("Path to the archive file - Tab for completions").
 				Placeholder("/path/to/archive.zip").
 				Value(&archivePath).
 				Validate(func(s string) error {
@@ -31,11 +31,12 @@ func RunExtractFlow() error {
 						return fmt.Errorf("archive does not exist")
 					}
 					return nil
-				}),
+				}).
+				Suggestions(getArchiveCompletions("")),
 
 			huh.NewInput().
 				Title("📂 Destination Path").
-				Description("Where to extract files").
+				Description("Where to extract files - Tab for completions").
 				Placeholder("/path/to/destination").
 				Value(&destPath).
 				Validate(func(s string) error {
@@ -43,7 +44,8 @@ func RunExtractFlow() error {
 						return fmt.Errorf("destination path cannot be empty")
 					}
 					return nil
-				}),
+				}).
+				Suggestions(getDirCompletions("")),
 		),
 
 		huh.NewGroup(
