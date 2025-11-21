@@ -17,7 +17,7 @@ func RunAnalyzeFlow() error {
 		huh.NewGroup(
 			huh.NewInput().
 				Title("📦 Archive Path").
-				Description("Path to the archive to analyze").
+				Description("Path to the archive to analyze - Tab for completions").
 				Placeholder("/path/to/archive.zip").
 				Value(&archivePath).
 				Validate(func(s string) error {
@@ -28,7 +28,8 @@ func RunAnalyzeFlow() error {
 						return fmt.Errorf("archive does not exist")
 					}
 					return nil
-				}),
+				}).
+				Suggestions(getArchiveCompletions("")),
 		),
 	).WithTheme(huh.ThemeCatppuccin())
 
