@@ -23,6 +23,10 @@ func main() {
 					huh.NewOption("📦 Compress files/folders", "compress"),
 					huh.NewOption("📂 Extract archive", "extract"),
 					huh.NewOption("🔍 Analyze archive", "analyze"),
+					huh.NewOption("📚 Batch compress", "batch-compress"),
+					huh.NewOption("📂 Batch extract", "batch-extract"),
+					huh.NewOption("🔄 Convert archive format", "convert"),
+					huh.NewOption("⚖️  Compare archives", "compare"),
 					huh.NewOption("🚪 Exit", "exit"),
 				).
 				Value(&operation),
@@ -47,6 +51,26 @@ func main() {
 		}
 	case "analyze":
 		if err := ui.RunAnalyzeFlow(); err != nil {
+			fmt.Println(ui.ErrorStyle.Render("❌ Error: " + err.Error()))
+			os.Exit(1)
+		}
+	case "batch-compress":
+		if err := ui.RunBatchCompressFlow(); err != nil {
+			fmt.Println(ui.ErrorStyle.Render("❌ Error: " + err.Error()))
+			os.Exit(1)
+		}
+	case "batch-extract":
+		if err := ui.RunBatchExtractFlow(); err != nil {
+			fmt.Println(ui.ErrorStyle.Render("❌ Error: " + err.Error()))
+			os.Exit(1)
+		}
+	case "convert":
+		if err := ui.RunConvertFlow(); err != nil {
+			fmt.Println(ui.ErrorStyle.Render("❌ Error: " + err.Error()))
+			os.Exit(1)
+		}
+	case "compare":
+		if err := ui.RunCompareFlow(); err != nil {
 			fmt.Println(ui.ErrorStyle.Render("❌ Error: " + err.Error()))
 			os.Exit(1)
 		}
