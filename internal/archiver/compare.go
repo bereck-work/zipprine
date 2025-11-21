@@ -6,7 +6,6 @@ import (
 
 	"zipprine/internal/models"
 )
-
 // ComparisonResult holds the result of comparing two archives
 type ComparisonResult struct {
 	OnlyInFirst  []string
