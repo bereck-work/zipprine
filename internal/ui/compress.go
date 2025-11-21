@@ -24,71 +24,6 @@ func RunCompressFlow() error {
 	// Get current working directory
 	cwd, _ := os.Getwd()
 
-	// Function to get directory completions
-	getDirCompletions := func(input string) []string {
-		if input == "" {
-			input = "."
-		}
-
-		// Expand home directory
-		if strings.HasPrefix(input, "~") {
-			home, err := os.UserHomeDir()
-			if err == nil {
-				input = filepath.Join(home, input[1:])
-			}
-		}
-
-		// Get the directory and file pattern
-		dir := filepath.Dir(input)
-		pattern := filepath.Base(input)
-
-		// If input ends with /, we want to list that directory
-		if strings.HasSuffix(input, string(filepath.Separator)) {
-			dir = input
-			pattern = ""
-		}
-
-		// Read directory
-		entries, err := os.ReadDir(dir)
-		if err != nil {
-			// If can't read, try parent directory
-			entries, err = os.ReadDir(".")
-			if err != nil {
-				return []string{}
-			}
-			dir = "."
-		}
-
-		completions := []string{}
-		for _, entry := range entries {
-			name := entry.Name()
-			
-			// Skip hidden files unless explicitly requested
-			if strings.HasPrefix(name, ".") && !strings.HasPrefix(pattern, ".") {
-				continue
-			}
-
-			// Filter by pattern
-			if pattern != "" && !strings.HasPrefix(strings.ToLower(name), strings.ToLower(pattern)) {
-				continue
-			}
-
-			fullPath := filepath.Join(dir, name)
-			if entry.IsDir() {
-				fullPath += string(filepath.Separator)
-			}
-
-			completions = append(completions, fullPath)
-		}
-
-		// Limit to 10 suggestions
-		if len(completions) > 10 {
-			completions = completions[:10]
-		}
-
-		return completions
-	}
-
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
@@ -112,14 +47,14 @@ func RunCompressFlow() error {
 					}
 					return nil
 				}).
-				Suggestions(getDirCompletions("")),
+				Suggestions(getPathCompletions("")),
 
 			huh.NewInput().
 				Title("💾 Output Path").
 				Description("Where to save (leave empty for auto-naming in current directory)").
 				Placeholder("Auto: <source-name>.<type> in current directory").
 				Value(&outputPath).
-				Suggestions(getDirCompletions("")),
+				Suggestions(getPathCompletions("")),
 		),
 
 		huh.NewGroup(
