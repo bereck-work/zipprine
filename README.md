@@ -1,6 +1,8 @@
-# 🗜️ Zipprine - TUI zipping tool
+# 🗜️ Zipprine - TUI/CLI Archiving Tool
 
-Zipprine is a modern TUI application for managing archives with support for multiple formats including ZIP, TAR, TAR.GZ, and GZIP.
+Zipprine is a modern TUI/CLI application for managing archives with support for multiple formats including ZIP, TAR, TAR.GZ, GZIP, and RAR (extraction only).
+
+**Version:** 1.0.3
 
 ## ✨ Features
 
@@ -10,10 +12,13 @@ Zipprine is a modern TUI application for managing archives with support for mult
 - **Compression levels**: Fast, Balanced, Best
 - **Smart filtering**: Include/exclude patterns with wildcards
 - **Integrity verification**: SHA256 checksums and validation
+- **CLI mode**: Non-interactive command-line interface for automation
 
 ### 📂 Extraction
 
 - **Auto-detection**: Automatically detects archive type by magic bytes
+- **RAR support**: Extract RAR archives (v4 and v5)
+- **Remote fetching**: Download and extract archives from URLs
 - **Safe extraction**: Optional overwrite protection
 - **Permission preservation**: Keep original file permissions
 - **Progress tracking**: Real-time extraction feedback
@@ -23,7 +28,7 @@ Zipprine is a modern TUI application for managing archives with support for mult
 - **Detailed statistics**: File count, sizes, compression ratios
 - **File listing**: View contents without extraction
 - **Checksum verification**: SHA256 integrity checks
-- **Format detection**: Magic byte analysis
+- **Format detection**: Magic byte analysis (including RAR)
 
 ### 📚 Batch Operations
 
@@ -45,6 +50,13 @@ Zipprine is a modern TUI application for managing archives with support for mult
 - **Preserve contents**: Maintains file structure and permissions
 - **Automatic extraction**: Seamless conversion process
 
+### 🌐 Remote Archive Fetching
+
+- **URL download**: Fetch archives from HTTP/HTTPS URLs
+- **Auto-extract**: Automatically extract downloaded archives
+- **Progress tracking**: Real-time download progress
+- **Format detection**: Supports all archive formats via URL
+
 ## 🚀 Installation
 
 ```bash
@@ -61,11 +73,17 @@ make build
 
 ## 📖 Usage
 
-Just run `zipprine` and follow the interactive menu:
+### Interactive Mode (TUI)
+
+Just run `zipprine` without arguments to launch the interactive menu:
+
+```bash
+zipprine
+```
 
 **Compress** - Choose files/folders, pick a format (ZIP, TAR, TAR.GZ, GZIP), and set your preferences
 
-**Extract** - Point to an archive and choose where to extract (format is auto-detected)
+**Extract** - Point to an archive and choose where to extract (format is auto-detected, supports RAR)
 
 **Analyze** - View detailed stats about any archive without extracting it
 
@@ -74,6 +92,53 @@ Just run `zipprine` and follow the interactive menu:
 **Compare** - Find differences between two archives
 
 **Convert** - Change archive formats while preserving structure
+
+### Command-Line Mode (CLI)
+
+For automation and scripting, use CLI flags:
+
+```bash
+# Compress a directory
+zipprine --compress /path/to/source --output archive.zip --type zip
+
+# Extract an archive (auto-detects format)
+zipprine --extract archive.tar.gz --output /path/to/dest
+
+# Extract a RAR archive
+zipprine --extract archive.rar --output /path/to/dest
+
+# Analyze an archive
+zipprine --analyze archive.zip
+
+# Download and extract from URL
+zipprine --url https://example.com/archive.zip --output /path/to/dest
+
+# Compress with exclusions
+zipprine --compress /project --output project.tar.gz --type tar.gz --exclude '*.log,*.tmp'
+
+# Show version
+zipprine --version
+
+# Show help
+zipprine --help
+```
+
+#### CLI Options
+
+- `--compress <path>` - Compress files/folders at the specified path
+- `--extract <path>` - Extract archive at the specified path
+- `--analyze <path>` - Analyze archive at the specified path
+- `--output <path>` - Output path for compression or extraction
+- `--type <type>` - Archive type: zip, tar, tar.gz, gzip, rar (default: zip)
+- `--level <1-9>` - Compression level: 1=fast, 6=balanced, 9=best (default: 6)
+- `--overwrite` - Overwrite existing files during extraction
+- `--preserve-perms` - Preserve file permissions (default: true)
+- `--exclude <patterns>` - Comma-separated patterns to exclude
+- `--include <patterns>` - Comma-separated patterns to include
+- `--verify` - Verify archive integrity after compression
+- `--url <url>` - Download and extract archive from remote URL
+- `--version` - Show version information
+- `--help` - Show help message
 
 ## 🔨 Building
 
@@ -123,11 +188,31 @@ make bench
 - `src/*,docs/*` - Only src and docs folders
 - `*.md,*.txt` - Only markdown and text files
 
+## 📚 Supported Formats
+
+### Compression (Create Archives)
+
+- **ZIP** - Universal format, works everywhere
+- **TAR** - Unix standard, no compression
+- **TAR.GZ** - Compressed TAR, best for Linux
+- **GZIP** - Single file compression
+
+### Extraction (Read Archives)
+
+- **ZIP** - Full support
+- **TAR** - Full support
+- **TAR.GZ** - Full support
+- **GZIP** - Full support
+- **RAR** - Extraction only (RAR v4 and v5)
+
+**Note:** RAR compression is not supported due to proprietary format restrictions. Use ZIP or TAR.GZ for creating archives.
+
 ## 🛠️ Technologies
 
 - **[Charm Bracelet Huh](https://github.com/charmbracelet/huh)** - Beautiful TUI forms
 - **[Lipgloss](https://github.com/charmbracelet/lipgloss)** - Styling and colors
-- **Go standard library** - Archive formats
+- **[rardecode](https://github.com/nwaples/rardecode)** - RAR extraction support
+- **Go standard library** - Archive formats and HTTP client
 
 ## 📝 License
 
