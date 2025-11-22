@@ -5,6 +5,7 @@ go 1.25.4
 require (
 	github.com/charmbracelet/huh v0.8.0
 	github.com/charmbracelet/lipgloss v1.1.0
+	github.com/nwaples/rardecode v1.1.3
 )
 
 require (
