@@ -25,8 +25,10 @@ func TestDetectArchiveTypeByExtension(t *testing.T) {
 		{"targz_extension", "test.tar.gz", models.TARGZ},
 		{"tgz_extension", "test.tgz", models.TARGZ},
 		{"gz_extension", "test.gz", models.GZIP},
+		{"rar_extension", "test.rar", models.RAR},
 		{"uppercase_zip", "test.ZIP", models.ZIP},
 		{"uppercase_tar", "test.TAR", models.TAR},
+		{"uppercase_rar", "test.RAR", models.RAR},
 	}
 
 	for _, tc := range testCases {
@@ -219,6 +221,37 @@ func TestDetectGzipMagicBytes(t *testing.T) {
 
 	if detectedType != models.GZIP {
 		t.Errorf("Expected GZIP, got %s", detectedType)
+	}
+}
+
+func TestDetectRarMagicBytes(t *testing.T) {
+	tmpDir, err := os.MkdirTemp("", "zipprine-rar-test-*")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tmpDir)
+
+	// Create a file with RAR magic bytes (no .rar extension)
+	testFile := filepath.Join(tmpDir, "test.bin")
+	file, err := os.Create(testFile)
+	if err != nil {
+		t.Fatalf("Failed to create test file: %v", err)
+	}
+
+	// Write RAR magic bytes: "Rar!" (0x52 0x61 0x72 0x21)
+	rarMagic := []byte{0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x00}
+	if _, err := file.Write(rarMagic); err != nil {
+		t.Fatalf("Failed to write RAR magic bytes: %v", err)
+	}
+	file.Close()
+
+	detectedType, err := DetectArchiveType(testFile)
+	if err != nil {
+		t.Fatalf("DetectArchiveType failed: %v", err)
+	}
+
+	if detectedType != models.RAR {
+		t.Errorf("Expected RAR, got %s", detectedType)
 	}
 }
 
