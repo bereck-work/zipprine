@@ -14,6 +14,7 @@ func TestArchiveTypeConstants(t *testing.T) {
 		{"TARGZ type", TARGZ, "TAR.GZ"},
 		{"TAR type", TAR, "TAR"},
 		{"GZIP type", GZIP, "GZIP"},
+		{"RAR type", RAR, "RAR"},
 		{"AUTO type", AUTO, "AUTO"},
 	}
 
