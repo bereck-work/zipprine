@@ -7,6 +7,7 @@ const (
 	TARGZ  ArchiveType = "TAR.GZ"
 	TAR    ArchiveType = "TAR"
 	GZIP   ArchiveType = "GZIP"
+	RAR    ArchiveType = "RAR"
 	AUTO   ArchiveType = "AUTO"
 )
 
