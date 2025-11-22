@@ -5,7 +5,7 @@
 
 # Application name
 BINARY_NAME=zipprine
-VERSION?=1.0.0
+VERSION?=1.0.3
 BUILD_DIR=build
 RELEASE_DIR=releases
 
@@ -41,7 +41,7 @@ help: ## Display this help screen
 	@echo "$(CYAN)║         🗜️  zipprine Build System 🚀              ║$(NC)"
 	@echo "$(CYAN)╚═══════════════════════════════════════════════════╝$(NC)"
 	@echo ""
-	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make $(CYAN)<target>$(NC)\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  $(CYAN)%-15s$(NC) %s\n", $1, $2 } /^##@/ { printf "\n$(MAGENTA)%s$(NC)\n", substr($0, 5) } ' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make $(CYAN)<target>$(NC)\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  $(CYAN)%-15s$(NC) %s\n", $$1, $$2 } /^##@/ { printf "\n$(MAGENTA)%s$(NC)\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 ##@ Development
 
@@ -232,9 +232,15 @@ release: clean build-all ## Create release packages
 
 checksums: ## Generate SHA256 checksums for releases
 	@echo "$(BLUE)🔐 Generating checksums...$(NC)"
-	@cd $(RELEASE_DIR) && shasum -a 256 * > SHA256SUMS
-	@echo "$(GREEN)✅ Checksums generated: $(RELEASE_DIR)/SHA256SUMS$(NC)"
-	@cat $(RELEASE_DIR)/SHA256SUMS
+	@mkdir -p $(RELEASE_DIR)
+	@rm -f $(RELEASE_DIR)/SHA256SUMS
+	@if [ -n "$$(ls -A $(RELEASE_DIR) 2>/dev/null)" ]; then \
+		cd $(RELEASE_DIR) && shasum -a 256 * > SHA256SUMS && \
+		echo "$(GREEN)✅ Checksums generated: $(RELEASE_DIR)/SHA256SUMS$(NC)" && \
+		cat SHA256SUMS; \
+	else \
+		echo "$(YELLOW)⚠️  No files found in $(RELEASE_DIR). Run 'make release' first.$(NC)"; \
+	fi
 
 ##@ Docker (Bonus)
 
