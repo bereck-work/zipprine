@@ -12,7 +12,6 @@ import (
 	"zipprine/internal/version"
 )
 
-// Run executes the CLI mode
 func Run() bool {
 	// Define flags
 	compress := flag.String("compress", "", "Compress files/folders (source path)")
@@ -32,24 +31,19 @@ func Run() bool {
 
 	flag.Parse()
 
-	// Show version
 	if *showVersion {
 		fmt.Println(version.FullVersion())
 		return true
 	}
 
-	// Show help
 	if *help {
 		printHelp()
 		return true
 	}
-
-	// Check if any CLI flags were provided
 	if flag.NFlag() == 0 {
-		return false // No flags, use interactive mode
+		return false
 	}
 
-	// Handle remote URL fetching
 	if *remoteURL != "" {
 		if *output == "" {
 			fmt.Println("❌ Error: --output is required when using --url")
@@ -68,7 +62,6 @@ func Run() bool {
 		return true
 	}
 
-	// Handle compression
 	if *compress != "" {
 		if *output == "" {
 			fmt.Println("❌ Error: --output is required for compression")
@@ -105,7 +98,6 @@ func Run() bool {
 		return true
 	}
 
-	// Handle extraction
 	if *extract != "" {
 		if *output == "" {
 			fmt.Println("❌ Error: --output is required for extraction")
@@ -172,7 +164,6 @@ func Run() bool {
 		return true
 	}
 
-	// If we get here, no valid operation was specified
 	fmt.Println("❌ Error: No valid operation specified. Use --help for usage information.")
 	os.Exit(1)
 	return true

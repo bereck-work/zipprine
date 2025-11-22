@@ -80,7 +80,6 @@ func TestCompareIdenticalArchives(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir)
 
-	// Create source directory
 	sourceDir := filepath.Join(tmpDir, "source")
 	os.Mkdir(sourceDir, 0755)
 	os.WriteFile(filepath.Join(sourceDir, "file1.txt"), []byte("content"), 0644)

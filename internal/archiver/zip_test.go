@@ -21,12 +21,10 @@ func TestCreateZip(t *testing.T) {
 	os.WriteFile(filepath.Join(sourceDir, "file1.txt"), []byte("content1"), 0644)
 	os.WriteFile(filepath.Join(sourceDir, "file2.txt"), []byte("content2"), 0644)
 
-	// Create subdirectory
 	subDir := filepath.Join(sourceDir, "subdir")
 	os.Mkdir(subDir, 0755)
 	os.WriteFile(filepath.Join(subDir, "file3.txt"), []byte("content3"), 0644)
 
-	// Create ZIP
 	zipPath := filepath.Join(tmpDir, "test.zip")
 	config := &models.CompressConfig{
 		SourcePath:       sourceDir,
@@ -59,11 +57,9 @@ func TestCreateZipWithCompressionLevels(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir)
 
-	// Create test file with compressible content
 	sourceDir := filepath.Join(tmpDir, "source")
 	os.Mkdir(sourceDir, 0755)
 	
-	// Create a file with repetitive content (compresses well)
 	content := make([]byte, 10000)
 	for i := range content {
 		content[i] = byte(i % 10)
@@ -402,11 +398,9 @@ func TestZipEmptyDirectory(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir)
 
-	// Create empty directory
 	sourceDir := filepath.Join(tmpDir, "empty")
 	os.Mkdir(sourceDir, 0755)
 
-	// Create ZIP
 	zipPath := filepath.Join(tmpDir, "empty.zip")
 	config := &models.CompressConfig{
 		SourcePath:       sourceDir,
@@ -420,7 +414,6 @@ func TestZipEmptyDirectory(t *testing.T) {
 		t.Fatalf("createZip failed: %v", err)
 	}
 
-	// Verify ZIP was created
 	if _, err := os.Stat(zipPath); os.IsNotExist(err) {
 		t.Error("ZIP file was not created")
 	}

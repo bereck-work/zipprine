@@ -228,7 +228,6 @@ func RunBatchExtractFlow() error {
 	fmt.Println(InfoStyle.Render(fmt.Sprintf("📂 Batch extracting %d archives...", len(configs))))
 	fmt.Println()
 
-	// Create batch config
 	batchConfig := &archiver.BatchExtractConfig{
 		Configs:    configs,
 		Parallel:   parallel,
@@ -246,7 +245,6 @@ func RunBatchExtractFlow() error {
 
 	errors := archiver.BatchExtract(batchConfig)
 
-	// Count successes
 	successCount := 0
 	for _, err := range errors {
 		if err == nil {

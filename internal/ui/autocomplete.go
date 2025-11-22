@@ -12,7 +12,6 @@ func getPathCompletions(input string) []string {
 		input = "."
 	}
 
-	// Expand home directory
 	if strings.HasPrefix(input, "~") {
 		home, err := os.UserHomeDir()
 		if err == nil {
@@ -20,20 +19,16 @@ func getPathCompletions(input string) []string {
 		}
 	}
 
-	// Get the directory and file pattern
 	dir := filepath.Dir(input)
 	pattern := filepath.Base(input)
 
-	// If input ends with /, we want to list that directory
 	if strings.HasSuffix(input, string(filepath.Separator)) {
 		dir = input
 		pattern = ""
 	}
 
-	// Read directory
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		// If can't read, try current directory
 		entries, err = os.ReadDir(".")
 		if err != nil {
 			return []string{}
@@ -63,7 +58,6 @@ func getPathCompletions(input string) []string {
 		completions = append(completions, fullPath)
 	}
 
-	// Limit to 15 suggestions
 	if len(completions) > 15 {
 		completions = completions[:15]
 	}
@@ -85,13 +79,11 @@ func getArchiveCompletions(input string) []string {
 	archiveCompletions := []string{}
 
 	for _, path := range allCompletions {
-		// Keep directories
 		if strings.HasSuffix(path, string(filepath.Separator)) {
 			archiveCompletions = append(archiveCompletions, path)
 			continue
 		}
 
-		// Check if file has archive extension
 		ext := filepath.Ext(path)
 		if archiveExts[ext] {
 			archiveCompletions = append(archiveCompletions, path)

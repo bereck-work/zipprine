@@ -21,7 +21,6 @@ func RunCompressFlow() error {
 	var verify bool
 	var compressionLevel string
 
-	// Get current working directory
 	cwd, _ := os.Getwd()
 
 	form := huh.NewForm(
@@ -124,14 +123,11 @@ func RunCompressFlow() error {
 		}
 	}
 
-	// Auto-generate output path if not provided
 	if outputPath == "" {
 		sourceName := filepath.Base(sourcePath)
 		
-		// Remove trailing slashes
 		sourceName = strings.TrimSuffix(sourceName, string(filepath.Separator))
 		
-		// Determine file extension based on archive type
 		var extension string
 		switch models.ArchiveType(archiveTypeStr) {
 		case models.ZIP:
@@ -146,7 +142,6 @@ func RunCompressFlow() error {
 			extension = ".zip"
 		}
 
-		// Create output path in current working directory
 		outputPath = filepath.Join(cwd, sourceName+extension)
 		
 		fmt.Println(InfoStyle.Render(fmt.Sprintf("📝 Auto-generated output: %s", outputPath)))

@@ -15,7 +15,7 @@ import (
 
 // FetchAndExtract downloads an archive from a URL and extracts it to the destination path
 func FetchAndExtract(archiveURL, destPath string, overwriteAll, preservePerms bool) error {
-	// Validate URL
+
 	parsedURL, err := url.Parse(archiveURL)
 	if err != nil {
 		return fmt.Errorf("invalid URL: %w", err)
@@ -25,13 +25,11 @@ func FetchAndExtract(archiveURL, destPath string, overwriteAll, preservePerms bo
 		return fmt.Errorf("only HTTP and HTTPS URLs are supported")
 	}
 
-	// Extract filename from URL
 	filename := filepath.Base(parsedURL.Path)
 	if filename == "" || filename == "." || filename == "/" {
 		filename = "archive.tmp"
 	}
 
-	// Create temporary directory
 	tempDir, err := os.MkdirTemp("", "zipprine-*")
 	if err != nil {
 		return fmt.Errorf("failed to create temp directory: %w", err)
@@ -40,7 +38,6 @@ func FetchAndExtract(archiveURL, destPath string, overwriteAll, preservePerms bo
 
 	tempFile := filepath.Join(tempDir, filename)
 
-	// Download the file
 	fmt.Printf("📥 Downloading from %s...\n", archiveURL)
 	if err := downloadFile(tempFile, archiveURL); err != nil {
 		return fmt.Errorf("failed to download file: %w", err)
@@ -48,7 +45,6 @@ func FetchAndExtract(archiveURL, destPath string, overwriteAll, preservePerms bo
 
 	fmt.Printf("✅ Download complete: %s\n", tempFile)
 
-	// Detect archive type
 	archiveType, err := archiver.DetectArchiveType(tempFile)
 	if err != nil {
 		return fmt.Errorf("failed to detect archive type: %w", err)
@@ -60,7 +56,6 @@ func FetchAndExtract(archiveURL, destPath string, overwriteAll, preservePerms bo
 
 	fmt.Printf("📦 Detected archive type: %s\n", archiveType)
 
-	// Extract the archive
 	fmt.Printf("📂 Extracting to %s...\n", destPath)
 	extractConfig := &models.ExtractConfig{
 		ArchivePath:   tempFile,
@@ -80,14 +75,12 @@ func FetchAndExtract(archiveURL, destPath string, overwriteAll, preservePerms bo
 
 // downloadFile downloads a file from a URL to a local path with progress indication
 func downloadFile(filepath, url string) error {
-	// Create the file
 	out, err := os.Create(filepath)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
 
-	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
@@ -99,10 +92,8 @@ func downloadFile(filepath, url string) error {
 		return fmt.Errorf("bad status: %s", resp.Status)
 	}
 
-	// Get content length for progress
 	contentLength := resp.ContentLength
 
-	// Create progress reader
 	var reader io.Reader = resp.Body
 	if contentLength > 0 {
 		reader = &progressReader{
@@ -119,7 +110,7 @@ func downloadFile(filepath, url string) error {
 		return err
 	}
 
-	fmt.Println() // New line after progress
+	fmt.Println()
 	return nil
 }
 
