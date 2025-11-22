@@ -4,13 +4,21 @@ import (
 	"fmt"
 	"os"
 
+	"zipprine/internal/cli"
 	"zipprine/internal/ui"
+	"zipprine/internal/version"
 
 	"github.com/charmbracelet/huh"
 )
 
 func main() {
+	// Try CLI mode first
+	if cli.Run() {
+		return
+	}
+
 	fmt.Println(ui.TitleStyle.Render("Zipprine - TUI Archiver"))
+	fmt.Println(ui.InfoStyle.Render("Version: " + version.Version()))
 	fmt.Println()
 
 	var operation string
@@ -23,6 +31,7 @@ func main() {
 					huh.NewOption("📦 Compress files/folders", "compress"),
 					huh.NewOption("📂 Extract archive", "extract"),
 					huh.NewOption("🔍 Analyze archive", "analyze"),
+					huh.NewOption("🌐 Fetch from URL", "remote-fetch"),
 					huh.NewOption("📚 Batch compress", "batch-compress"),
 					huh.NewOption("📂 Batch extract", "batch-extract"),
 					huh.NewOption("🔄 Convert archive format", "convert"),
@@ -51,6 +60,11 @@ func main() {
 		}
 	case "analyze":
 		if err := ui.RunAnalyzeFlow(); err != nil {
+			fmt.Println(ui.ErrorStyle.Render("❌ Error: " + err.Error()))
+			os.Exit(1)
+		}
+	case "remote-fetch":
+		if err := ui.RunRemoteFetchFlow(); err != nil {
 			fmt.Println(ui.ErrorStyle.Render("❌ Error: " + err.Error()))
 			os.Exit(1)
 		}

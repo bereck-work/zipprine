@@ -26,6 +26,8 @@ func DetectArchiveType(path string) (models.ArchiveType, error) {
 		return models.TAR, nil
 	case ".tgz":
 		return models.TARGZ, nil
+	case ".rar":
+		return models.RAR, nil
 	}
 
 	// Try by magic bytes
@@ -70,6 +72,11 @@ func DetectArchiveType(path string) (models.ArchiveType, error) {
 		return models.TAR, nil
 	}
 
+	// RAR magic: Rar! (0x52 0x61 0x72 0x21)
+	if len(header) >= 4 && header[0] == 0x52 && header[1] == 0x61 && header[2] == 0x72 && header[3] == 0x21 {
+		return models.RAR, nil
+	}
+
 	return models.AUTO, nil
 }
 
@@ -86,6 +93,8 @@ func Analyze(path string) (*models.ArchiveInfo, error) {
 		return analyzeTar(path, true)
 	case models.TAR:
 		return analyzeTar(path, false)
+	case models.RAR:
+		return analyzeRar(path)
 	case models.GZIP:
 		// For GZIP, provide basic file info
 		file, err := os.Open(path)

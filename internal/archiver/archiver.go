@@ -14,6 +14,8 @@ func Compress(config *models.CompressConfig) error {
 		return createTar(config)
 	case models.GZIP:
 		return createGzip(config)
+	case models.RAR:
+		return createRar(config)
 	default:
 		return nil
 	}
@@ -29,6 +31,8 @@ func Extract(config *models.ExtractConfig) error {
 		return extractTar(config)
 	case models.GZIP:
 		return extractGzip(config)
+	case models.RAR:
+		return extractRar(config)
 	default:
 		return nil
 	}
